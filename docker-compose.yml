@@ -1,0 +1,39 @@
+version: '3'
+services:
+  mongo:
+    image: 'mongo'
+    volumes:
+      - mongodb_data_container:/data/db
+    container_name: 'almuhasba-mongodb'
+    restart: 'always'
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: rootpassword
+    ports:
+      - '27018:27017'
+    networks:
+      - esnet
+
+  almuhasba:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    env_file:
+      - .env.development
+    volumes:
+      - ./src:/app/src
+    container_name: 'almuhasba-backend'
+    restart: 'always'
+    links:
+      - mongo
+    depends_on:
+      - 'mongo'
+    ports:
+      - '3000:3000'
+    networks:
+      - esnet
+
+networks:
+  esnet:
+volumes:
+  mongodb_data_container:
